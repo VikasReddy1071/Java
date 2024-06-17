@@ -1,0 +1,149 @@
+@Entity
+public class Doctor {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String name;
+    private String specialty;
+    private String email;
+    // Getters and Setters
+}
+@Entity
+public class Patient {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String name;
+    private String email;
+    private String medicalHistory;
+    // Getters and Setters
+}
+@Entity
+public class Appointment {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private LocalDateTime appointmentTime;
+    
+    @ManyToOne
+    private Doctor doctor;
+    
+    @ManyToOne
+    private Patient patient;
+    // Getters and Setters
+}
+public interface DoctorRepository extends JpaRepository<Doctor, Long> {
+}
+public interface PatientRepository extends JpaRepository<Patient, Long> {
+}public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
+    List<Appointment> findByDoctor(Doctor doctor);
+}
+@Controller
+@RequestMapping("/admin")
+public class AdminController {
+    @Autowired
+    private DoctorRepository doctorRepository;
+
+    @GetMapping("/doctors")
+    public String listDoctors(Model model) {
+        model.addAttribute("doctors", doctorRepository.findAll());
+        return "admin/doctors";
+    }
+
+    @GetMapping("/doctors/new")
+    public String createDoctorForm(Model model) {
+        model.addAttribute("doctor", new Doctor());
+        return "admin/create_doctor";
+    }
+
+    @PostMapping("/doctors")
+    public String saveDoctor(@ModelAttribute Doctor doctor) {
+        doctorRepository.save(doctor);
+        return "redirect:/admin/doctors";
+    }
+
+    @GetMapping("/appointments")
+    public String listAppointments(Model model) {
+        // Add logic to fetch appointments
+        return "admin/appointments";
+    }
+}
+@Controller
+@RequestMapping("/doctor")
+public class DoctorController {
+    @Autowired
+    private AppointmentRepository appointmentRepository;
+
+    @Autowired
+    private DoctorRepository doctorRepository;
+
+    @GetMapping("/{doctorId}/appointments")
+    public String listAppointments(@PathVariable Long doctorId, Model model) {
+        Doctor doctor = doctorRepository.findById(doctorId).orElse(null);
+        if (doctor != null) {
+            model.addAttribute("appointments", appointmentRepository.findByDoctor(doctor));
+        }
+        return "doctor/appointments";
+    }
+}
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Doctors</title>
+</head>
+<body>
+    <h1>Doctors</h1>
+    <a href="/admin/doctors/new">Add New Doctor</a>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Specialty</th>
+        </tr>
+        <tr th:each="doctor : ${doctors}">
+            <td th:text="${doctor.id}"></td>
+            <td th:text="${doctor.name}"></td>
+            <td th:text="${doctor.specialty}"></td>
+        </tr>
+    </table>
+</body>
+</html>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Create Doctor</title>
+</head>
+<body>
+    <h1>Create Doctor</h1>
+    <form th:action="@{/admin/doctors}" th:object="${doctor}" method="post">
+        <label>Name:</label>
+        <input type="text" th:field="*{name}" />
+        <label>Specialty:</label>
+        <input type="text" th:field="*{specialty}" />
+        <button type="submit">Save</button>
+    </form>
+</body>
+</html>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Appointments</title>
+</head>
+<body>
+    <h1>Appointments</h1>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Time</th>
+            <th>Doctor</th>
+            <th>Patient</th>
+        </tr>
+        <tr th:each="appointment : ${appointments}">
+            <td th:text="${appointment.id}"></td>
+            <td th:text="${appointment.appointmentTime}"></td>
+            <td th:text="${appointment.doctor.name}"></td>
+            <td th:text="${appointment.patient.name}"></td>
+        </tr>
+    </table>
+</body>
+</html>
