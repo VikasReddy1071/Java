@@ -1,0 +1,134 @@
+1. Create the Task class*: This will represent individual tasks.
+2. Create the TaskList class*: This will manage the list of tasks.
+3. Create the TaskListApplication class*: This will handle user interactions through a text-based user interface.
+
+Step 1: Create the Task Class
+
+This class will represent a task with a description.
+// program
+public class Task {
+    private String description;
+
+    public Task(String description) {
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    @Override
+    public String toString() {
+        return description;
+    }
+}
+
+Step 2: Create the TaskList Class
+
+This class will manage the list of tasks, providing methods to add, remove, and list tasks.
+// jave program
+
+import java.util.ArrayList;
+
+public class TaskList {
+    private ArrayList<Task> tasks;
+
+    public TaskList() {
+        tasks = new ArrayList<>();
+    }
+
+    public void addTask(String description) {
+        tasks.add(new Task(description));
+    }
+
+    public boolean removeTask(int index) {
+        if (index >= 0 && index < tasks.size()) {
+            tasks.remove(index);
+            return true;
+        }
+        return false;
+    }
+
+    public void listTasks() {
+        if (tasks.isEmpty()) {
+            System.out.println("No tasks in the list.");
+        } else {
+            for (int i = 0; i < tasks.size(); i++) {
+                System.out.println((i + 1) + ". " + tasks.get(i));
+            }
+        }
+    }
+}
+
+Step 3: Create the TaskListApplication Class
+
+This class will handle user input and interact with the TaskList class to perform operations.
+// java program
+
+import java.util.Scanner;
+
+public class TaskListApplication {
+    private static TaskList taskList = new TaskList();
+    private static Scanner scanner = new Scanner(System.in);
+
+    public static void main(String[] args) {
+        while (true) {
+            printMenu();
+            String choice = scanner.nextLine();
+
+            switch (choice) {
+                case "1":
+                    addTask();
+                    break;
+                case "2":
+                    removeTask();
+                    break;
+                case "3":
+                    listTasks();
+                    break;
+                case "4":
+                    System.out.println("Exiting the application.");
+                    return;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+
+    private static void printMenu() {
+        System.out.println("Task List Application");
+        System.out.println("1. Add Task");
+        System.out.println("2. Remove Task");
+        System.out.println("3. List Tasks");
+        System.out.println("4. Exit");
+        System.out.print("Enter your choice: ");
+    }
+
+    private static void addTask() {
+        System.out.print("Enter task description: ");
+        String description = scanner.nextLine();
+        taskList.addTask(description);
+        System.out.println("Task added.");
+    }
+
+    private static void removeTask() {
+        System.out.print("Enter task number to remove: ");
+        int taskNumber = Integer.parseInt(scanner.nextLine());
+        if (taskList.removeTask(taskNumber - 1)) {
+            System.out.println("Task removed.");
+        } else {
+            System.out.println("Invalid task number.");
+        }
+    }
+
+    private static void listTasks() {
+        System.out.println("Task List:");
+        taskList.listTasks();
+    }
+}
+
+1. Task Class: Represents a single task with a description.
+2. TaskList Class: Manages a list of tasks, allowing addition, removal, and listing of tasks.
+3. TaskListApplication Class: Provides a text-based interface for the user to interact with the task list.
+
+To run this application, compile all three classes and execute the `TaskListApplication` class.
